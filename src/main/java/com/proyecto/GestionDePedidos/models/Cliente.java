@@ -8,7 +8,6 @@ import jakarta.persistence.OneToMany;
 import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
-
 /**
  *
  * @author Cain
@@ -22,14 +21,14 @@ public class Cliente {
     private Long idCliente;
     private String nombre;
     private String apellido;
-    private int dni;
+    private String dni;
     @OneToMany(mappedBy = "cliente")
     private List<Pedido> listaDePedidos;
 
     public Cliente() {
     }
 
-    public Cliente(Long idCliente, String nombre, String apellido, int dni, List<Pedido> listaDePedidos) {
+    public Cliente(Long idCliente, String nombre, String apellido, String dni, List<Pedido> listaDePedidos) {
         this.idCliente = idCliente;
         this.nombre = nombre;
         this.apellido = apellido;
