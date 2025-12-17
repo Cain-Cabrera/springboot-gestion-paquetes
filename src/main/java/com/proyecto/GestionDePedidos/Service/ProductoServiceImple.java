@@ -1,6 +1,7 @@
 package com.proyecto.GestionDePedidos.Service;
 
 import com.proyecto.GestionDePedidos.DTO.ProductoRequestDTO;
+import com.proyecto.GestionDePedidos.DTO.ProductoResponseDTO;
 import com.proyecto.GestionDePedidos.Mapper.ProductoMapper;
 import com.proyecto.GestionDePedidos.Repository.ProductoRepository;
 import com.proyecto.GestionDePedidos.models.Producto;
@@ -16,7 +17,8 @@ import org.springframework.stereotype.Service;
  * @author Cain
  */
 @Service
-public class ProductoServiceImple implements ProductoService{
+public class ProductoServiceImple implements ProductoService {
+
     private final ProductoRepository productoRepository;
     private final ProductoValidator productoValidator;
     private final ProductoMapper productoMapper;
@@ -27,59 +29,64 @@ public class ProductoServiceImple implements ProductoService{
         this.productoValidator = productoValidator;
         this.productoMapper = productoMapper;
     }
-    
-    
+
+    private Producto findByIdEntity(Long id) {
+        logger.trace("Se ejecuta metodo findByIdEntity para implementar el metodo internamente y no exponer entidad");
+        return productoRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Producto no encontrado.."));
+    }
+
     @Override
-    public Producto createProducto(ProductoRequestDTO productoDTO) {
+    public ProductoResponseDTO createProducto(ProductoRequestDTO productoDTO) {
         logger.trace("Se ejecuta createProducto..");
         productoValidator.validarAlta(productoDTO);
         Producto producto = productoMapper.toEntity(productoDTO);
         logger.info("Producto creado con exito..");
-        return productoRepository.save(producto);
+        productoRepository.save(producto);
+        return productoMapper.toResponse(producto);
     }
 
     @Override
-    public Producto updateProducto(Long id, ProductoRequestDTO productoDTO) {
-       logger.trace("Se ejecuta updateProducto para actualizar producto existente..");
-       productoValidator.validarAlta(productoDTO);
-       Producto productoExistente = productoRepository.findById(id)
-               .orElseThrow(() -> new EntityNotFoundException("Producto no encontrado.."));
-       productoMapper.updateEntity(productoDTO, productoExistente);
-       logger.info("Producto actualizado con exito..");
-       return productoRepository.save(productoExistente);
+    public ProductoResponseDTO updateProducto(Long id, ProductoRequestDTO productoDTO) {
+        logger.trace("Se ejecuta updateProducto para actualizar producto existente..");
+        productoValidator.validarAlta(productoDTO);
+        Producto productoExistente = productoRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Producto no encontrado.."));
+        productoMapper.updateEntity(productoDTO, productoExistente);
+        productoRepository.save(productoExistente);
+        logger.info("Producto actualizado con exito..");
+        return productoMapper.toResponse(productoExistente);
     }
 
     @Override
     public void deleteProducto(Long id) {
-       logger.trace("Se ejecuta deleteProducto..");
-
-    if (id == null || id <= 0) {
-        logger.error("ID inválido para borrar Producto: {}", id);
-        throw new IllegalArgumentException("El id debe ser mayor a 0");
-    }
-
-    Producto producto = productoRepository.findById(id)
-            .orElseThrow(() -> new EntityNotFoundException("Producto no encontrado"));
-
-    productoRepository.delete(producto);
-    logger.info("Producto con id {} borrado con éxito..", id);
+        logger.trace("Se ejecuta deleteProducto..");
+        if (id == null || id <= 0) {
+            logger.error("ID inválido para borrar Producto: {}", id);
+            throw new IllegalArgumentException("El id debe ser mayor a 0");
+        }
+        Producto producto = findByIdEntity(id);
+        productoRepository.delete(producto);
+        logger.info("Producto con id {} borrado con éxito..", id);
     }
 
     @Override
-    public List<Producto> findAll() {
+    public List<ProductoResponseDTO> findAll() {
         logger.trace("Se ejecuta findAll para listar productos..");
-        return productoRepository.findAll();
+        List<Producto> listaProductos = productoRepository.findAll();
+        return productoMapper.toResponseList(listaProductos);
     }
 
     @Override
-    public Producto findById(Long id) {
-       logger.trace("Se ejecuta findById para buscar producto..");
-    if (id == null || id <= 0) {
-        logger.error("ID inválido para buscar Producto: {}", id);
-        throw new IllegalArgumentException("El id debe ser mayor a 0");
+    public ProductoResponseDTO findById(Long id) {
+        logger.trace("Se ejecuta findById para buscar producto..");
+        if (id == null || id <= 0) {
+            logger.error("ID inválido para buscar Producto: {}", id);
+            throw new IllegalArgumentException("El id debe ser mayor a 0");
+        }
+        Producto producto = findByIdEntity(id);
+        logger.info("Producto con id {} encontrado con exito..", id);
+        return productoMapper.toResponse(producto);
     }
-    return productoRepository.findById(id)
-            .orElseThrow(() -> new EntityNotFoundException("Producto no encontrado"));
-    }
-    
+
 }

@@ -2,6 +2,7 @@ package com.proyecto.GestionDePedidos.Service;
 
 import com.proyecto.GestionDePedidos.DTO.DetallePedidoRequestDTO;
 import com.proyecto.GestionDePedidos.DTO.PedidoRequestDTO;
+import com.proyecto.GestionDePedidos.DTO.PedidoResponseDTO;
 import com.proyecto.GestionDePedidos.Mapper.PedidoMapper;
 import com.proyecto.GestionDePedidos.Repository.ClienteRepository;
 import com.proyecto.GestionDePedidos.Repository.PedidoRepository;
@@ -38,14 +39,19 @@ public class PedidoServiceImple implements PedidoService{
         this.pedidoMapper = pedidoMapper;
         this.productoRepository = productoRepository;
     }
+    
+    private Pedido findbyIdPedidoEntity(Long id) {
+        return pedidoRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("El pedido no existe"));
+    }
    
     @Override
-    public Pedido createPedido(PedidoRequestDTO pedidoDto) {
+    public PedidoResponseDTO createPedido(PedidoRequestDTO pedidoDto) {
         logger.trace("Se ejecuta createPedido para crear nuevo Pedido asociado a un cliente..");
         validatorPedido.validarAltaPedido(pedidoDto);
         Cliente clienteExistente = clienteRepository.findById(pedidoDto.getIdCliente())
-                
                 .orElseThrow(() -> new EntityNotFoundException("Cliente no encontrado."));
+        
         Pedido pedido = pedidoMapper.toEntity(pedidoDto,clienteExistente);
         
         List<DetalleDePedido> detalles = new ArrayList<>();
@@ -67,34 +73,40 @@ public class PedidoServiceImple implements PedidoService{
 
         detalles.add(detalle);
         producto.setStock(producto.getStock() - detalleDto.getCantidad());
-    }
+        }
 
-    pedido.setDetalleDelPedido(detalles);
-
-        return pedidoRepository.save(pedido);
+        pedido.setDetalleDelPedido(detalles);
+        pedidoRepository.save(pedido);
+        
+        return pedidoMapper.toResponse(pedido);
     }
     
     @Override
-    public List<Pedido> findAll() {
+    public List<PedidoResponseDTO> findAll() {
         logger.trace("Se ejecuta metodo FindAll para traer todos los pedidos..");
-        return pedidoRepository.findAll();
+        List<Pedido> pedidos = pedidoRepository.findAll(); 
+        List<PedidoResponseDTO> listaResponse = pedidoMapper.toResponseList(pedidos);
+        return listaResponse;
     }
 
     @Override
-    public Pedido findById(Long id) {
+    public PedidoResponseDTO findById(Long id) {
         logger.trace("Se ejecuta metodo finbyId para traer Pedido por id..");
-        return pedidoRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("El pedido no existe"));
+        Pedido PedidoExistente = findbyIdPedidoEntity(id);
+        logger.info("Pedido con id: {} encontrado..", id);
+        return pedidoMapper.toResponse(PedidoExistente);
     }
 
     @Override
-    public Pedido updatePedido(PedidoRequestDTO pedidoDto) {
+    public PedidoResponseDTO updatePedido(PedidoRequestDTO pedidoDto) {
         logger.trace("Se ejecuta updatePedido para actualizar pedido existente..");
         Pedido pedidoAActualizar = pedidoRepository.findById(pedidoDto.getIdCliente())
                 .orElseThrow(() -> new IllegalArgumentException("Pedido no encontrado"));
         pedidoMapper.updateEntity(pedidoAActualizar, pedidoDto);
         logger.warn("Puede ser que no se serialize bien el Pedido.. ");
-        return pedidoRepository.save(pedidoAActualizar);
+        pedidoRepository.save(pedidoAActualizar);
+        logger.info("Pedido actualizado con exito..");
+        return pedidoMapper.toResponse(pedidoAActualizar);
     }
     
     @Override
@@ -104,11 +116,8 @@ public class PedidoServiceImple implements PedidoService{
             logger.error("ID inválido para borrar Pedido: {}" , id);
             throw new IllegalArgumentException("El id debe ser mayor a 0");
         }
-        Pedido pedido = findById(id);
+        Pedido pedido = findbyIdPedidoEntity(id);
         pedidoRepository.deleteById(id);
         logger.info("Pedido con id {} borrado con exito.. ", id);
-    }
-    
-    
-    
+    } 
 }
