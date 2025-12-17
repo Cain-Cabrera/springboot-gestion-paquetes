@@ -1,8 +1,10 @@
 package com.proyecto.GestionDePedidos.Mapper;
 
-import com.proyecto.GestionDePedidos.DTO.ClienteDTO;
+import com.proyecto.GestionDePedidos.DTO.ClienteRequestDTO;
 import com.proyecto.GestionDePedidos.DTO.ClienteResponseDTO;
 import com.proyecto.GestionDePedidos.models.Cliente;
+import java.util.ArrayList;
+import java.util.List;
 import org.springframework.stereotype.Component;
 /**
  *
@@ -11,7 +13,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class ClienteMapper {
     
-    public Cliente mapperCreateEntidad(ClienteDTO clientedto) {
+    public Cliente mapperCreateEntidad(ClienteRequestDTO clientedto) {
         Cliente clienteEntity = new Cliente();
         clienteEntity.setNombre(clientedto.getNombre());
         clienteEntity.setApellido(clientedto.getApellido());
@@ -19,7 +21,7 @@ public class ClienteMapper {
         return clienteEntity;
     }
     
-    public void mapperUpdateEntidad(ClienteDTO dto, Cliente clienteExistente) {
+    public void mapperUpdateEntidad(ClienteRequestDTO dto, Cliente clienteExistente) {
         clienteExistente.setNombre(dto.getNombre());
         clienteExistente.setApellido(dto.getApellido());
         clienteExistente.setDni(dto.getDni());
@@ -31,5 +33,13 @@ public class ClienteMapper {
         clienteReponse.setApellido(cliente.getApellido());
         clienteReponse.setNombre(cliente.getNombre());
         return clienteReponse;
+    }
+    
+    public List<ClienteResponseDTO> toResponseList(List<Cliente> listaClientes) {
+        List<ClienteResponseDTO> clientes = new ArrayList<>();
+        for (Cliente cliente : listaClientes) {
+            clientes.add(toResponse(cliente));
+        }
+        return clientes;
     }
 }
