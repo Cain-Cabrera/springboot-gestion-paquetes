@@ -2,6 +2,7 @@ package com.proyecto.GestionDePedidos.Service;
 
 import com.proyecto.GestionDePedidos.DTO.ProductoRequestDTO;
 import com.proyecto.GestionDePedidos.DTO.ProductoResponseDTO;
+import com.proyecto.GestionDePedidos.Exception.ProductoNotFoundException;
 import com.proyecto.GestionDePedidos.Mapper.ProductoMapper;
 import com.proyecto.GestionDePedidos.Repository.ProductoRepository;
 import com.proyecto.GestionDePedidos.models.Producto;
@@ -33,7 +34,7 @@ public class ProductoServiceImple implements ProductoService {
     private Producto findByIdEntity(Long id) {
         logger.trace("Se ejecuta metodo findByIdEntity para implementar el metodo internamente y no exponer entidad");
         return productoRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Producto no encontrado.."));
+                .orElseThrow(() -> new ProductoNotFoundException(id));
     }
 
     @Override
@@ -51,7 +52,7 @@ public class ProductoServiceImple implements ProductoService {
         logger.trace("Se ejecuta updateProducto para actualizar producto existente..");
         productoValidator.validarAlta(productoDTO);
         Producto productoExistente = productoRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Producto no encontrado.."));
+                .orElseThrow(() -> new ProductoNotFoundException(id));
         productoMapper.updateEntity(productoDTO, productoExistente);
         productoRepository.save(productoExistente);
         logger.info("Producto actualizado con exito..");
