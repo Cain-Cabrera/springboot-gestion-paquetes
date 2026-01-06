@@ -120,10 +120,13 @@ public class ProductoServiceImpleTest {
         response.setId(id);
 
         doNothing().when(productoValidator).validarAlta(request);
-        when(productoRepository.findById(id)).thenReturn(Optional.of(productoExistente));
+        when(productoRepository.findById(id))
+                .thenReturn(Optional.of(productoExistente));
         doNothing().when(productoMapper).updateEntity(request, productoExistente);
-        when(productoRepository.save(productoExistente)).thenReturn(productoExistente);
-        when(productoMapper.toResponse(productoExistente)).thenReturn(response);
+        when(productoRepository.save(productoExistente))
+                .thenReturn(productoExistente);
+        when(productoMapper.toResponse(productoExistente))
+                .thenReturn(response);
 
         ProductoResponseDTO resultado = productoService.updateProducto(id, request);
 
@@ -138,7 +141,8 @@ public class ProductoServiceImpleTest {
         ProductoRequestDTO request = ProductoRequestTestBuilder.unProductoRequest().build();
 
         doNothing().when(productoValidator).validarAlta(request);
-        when(productoRepository.findById(id)).thenReturn(Optional.empty());
+        when(productoRepository.findById(id))
+                .thenReturn(Optional.empty());
 
         assertThrows(ProductoNotFoundException.class,
                 () -> productoService.updateProducto(id, request));
@@ -155,8 +159,10 @@ public class ProductoServiceImpleTest {
         ProductoResponseDTO response = new ProductoResponseDTO();
         response.setId(id);
 
-        when(productoRepository.findById(id)).thenReturn(Optional.of(producto));
-        when(productoMapper.toResponse(producto)).thenReturn(response);
+        when(productoRepository.findById(id))
+                .thenReturn(Optional.of(producto));
+        when(productoMapper.toResponse(producto))
+                .thenReturn(response);
 
         ProductoResponseDTO resultado = productoService.findById(id);
 
@@ -183,8 +189,10 @@ public class ProductoServiceImpleTest {
             new ProductoResponseDTO()
     );
 
-    when(productoRepository.findAll()).thenReturn(productos);
-    when(productoMapper.toResponseList(productos)).thenReturn(responses);
+    when(productoRepository.findAll())
+            .thenReturn(productos);
+    when(productoMapper.toResponseList(productos))
+            .thenReturn(responses);
 
     List<ProductoResponseDTO> resultado = productoService.findAll();
 
@@ -199,7 +207,8 @@ public class ProductoServiceImpleTest {
             .conId(id)
             .build();
 
-    when(productoRepository.findById(id)).thenReturn(Optional.of(producto));
+    when(productoRepository.findById(id))
+            .thenReturn(Optional.of(producto));
 
     productoService.deleteProducto(id);
 
