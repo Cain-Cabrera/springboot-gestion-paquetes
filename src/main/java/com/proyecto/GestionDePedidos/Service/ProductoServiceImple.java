@@ -7,7 +7,6 @@ import com.proyecto.GestionDePedidos.Mapper.ProductoMapper;
 import com.proyecto.GestionDePedidos.Repository.ProductoRepository;
 import com.proyecto.GestionDePedidos.models.Producto;
 import com.proyecto.GestionDePedidos.validatorService.ProductoValidator;
-import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
