@@ -41,9 +41,5 @@ public class DetalleDePedido {
         this.id = id;
         this.cantidad = cantidad;
         this.precioUnitario = precioUnitario;
-    }
-    
-    
-    
-    
+    }   
 }

@@ -44,13 +44,5 @@ public class Pedido {
         this.estado = estado;
         this.cliente = cliente;
         this.detalleDelPedido = detalleDelPedido;
-    }
-
-    
-    
-    
-    
-    
-    
-    
+    }  
 }
